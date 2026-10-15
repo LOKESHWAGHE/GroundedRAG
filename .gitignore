@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Env
+.env
+backend/.env
+
+# Data / indexes (never commit uploaded documents or built indexes)
+data/
+backend/data/
+*.index
+*.pkl
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Evaluation outputs
+evaluation/results/*.json
+evaluation/results/*.csv
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

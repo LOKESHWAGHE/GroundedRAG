@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: grounded-rag-db
+    environment:
+      POSTGRES_USER: grounded_rag
+      POSTGRES_PASSWORD: grounded_rag
+      POSTGRES_DB: grounded_rag
+    ports:
+      - "5432:5432"
+    volumes:
+      - grounded_rag_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grounded_rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: grounded-rag-backend
+    env_file:
+      - backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://grounded_rag:grounded_rag@postgres:5432/grounded_rag
+      # Explicit, because settings.data_path otherwise derives from the backend
+      # package's own location (REPO_ROOT = backend/..), which only resolves
+      # correctly when the full repo is on disk. Inside this container only
+      # backend/ is copied in as /app, so REPO_ROOT would resolve to "/" and
+      # silently miss the ./data:/app/data volume mounted below. Setting
+      # DATA_DIR explicitly keeps uploads and indexes on the host volume
+      # (and therefore persisted across `docker compose down`/`up`).
+      DATA_DIR: /app/data
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: grounded-rag-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api/v1
+    depends_on:
+      backend:
+        condition: service_healthy
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  grounded_rag_pgdata:

@@ -1,0 +1,15 @@
+Quarterly Incident Report - Q3
+
+During Q3, the warehouse automation fleet experienced 4 reportable
+incidents. Incident INC-1042 involved an ArmFlex-900 unit at the Pune
+facility that halted unexpectedly due to a firmware bug in version 4.1.8;
+this was resolved by the 4.2.1 firmware update released in August.
+
+Incident INC-1055 was a sensor calibration drift detected at the Mumbai
+facility, which was corrected during routine maintenance with no safety
+impact. Two minor incidents (INC-1061 and INC-1063) involved operator error
+during manual override mode and resulted in updated training materials
+being issued to all floor operators.
+
+No incidents in Q3 resulted in injury or significant property damage. The
+mean time to resolution across all four incidents was 6.5 hours.
